@@ -2,3 +2,7 @@ streamlit
 toml
 requests
 python-pptx
+pymupdf
+docx2txt
+fitz
+pdf2image
