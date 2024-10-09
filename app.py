@@ -8,12 +8,12 @@ import toml,json, requests
 #load_dotenv()
 
 #openai.api_key = os.getenv('OPENAI_API_KEY')  # Replace with your actual API key
-file_path = 'credentials.txt'
+file_path = './credential.txt'
 if os.path.exists(file_path):
     with open(file_path, 'r') as f:
         secrets = toml.load(f)
 else:
-    secrets = st.secrets
+    st.warning("Credentials file not found. Please upload the credentials file.")
 OPENROUTER_API_KEY = secrets['OPENROUTER']['OPENROUTER_API_KEY']
 # Define custom formatting options
 TITLE_FONT_SIZE = Pt(30)
