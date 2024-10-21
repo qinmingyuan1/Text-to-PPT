@@ -117,6 +117,7 @@ def ppt_to_pdf(ppt_file_path, pdf_file_path):
         raise FileNotFoundError(f"The file {ppt_file_path} does not exist.")
 
     # Create PowerPoint application object
+    comtypes.CoInitialize()
     powerpoint = comtypes.client.CreateObject("PowerPoint.Application")
     powerpoint.Visible = 1
 
@@ -134,6 +135,7 @@ def ppt_to_pdf(ppt_file_path, pdf_file_path):
     finally:
         # Quit PowerPoint
         powerpoint.Quit()
+        comtypes.CoUninitialize()
 
 def empdf(pdf_file_path):
     with open(pdf_file_path, "rb") as f:
@@ -163,6 +165,8 @@ def main():
     st.title("PowerPoint Presentation Generator with GPT-3.5-turbo")
     # Create two columns
     col1, col2 = st.columns(2)
+    txt = None
+    wd = None
     df = None
     pf = None
     md = None
@@ -170,45 +174,40 @@ def main():
     with col2:
         topic = st.text_input("Enter the topic for your presentation:")
         preferences = st.text_input("Enter your preferences for the presentation:")
-        uploaded_file = st.file_uploader("Choose a file",type=['md','docx','csv','pdf','pptx'])
+        uploaded_file = st.file_uploader("Choose a file",type=['md','docx','csv','pdf','pptx','txt'])
         chat = st.text_area("Chat with the AI")
         GenerateButton = st.button("Generate Presentation")
         ShareButton = st.button("Share Presentation")
+        # Add checkboxes for user to select options
+        show_input_file = st.checkbox("Display Input File", value=True)
+        show_output_preview = st.checkbox("Display Output Preview", value=True)
         if uploaded_file is not None:
-            st.success(uploaded_file.type)
             if uploaded_file.type == 'text/csv':
                 df = pd.read_csv(uploaded_file)
-                st.success("csv uploaded successfully")
             elif uploaded_file.type == 'application/octet-stream':
                 md = uploaded_file.getvalue().decode("utf-8")
-                st.success("md uploaded successfully")
             elif uploaded_file.type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-                text = docx2txt.process(uploaded_file)
-                st.success("docx uploaded successfully")
+                wd = docx2txt.process(uploaded_file)
+            elif uploaded_file.type == 'text/plain':
+                txt = uploaded_file.getvalue().decode("utf-8")
             elif uploaded_file.type == 'application/pdf':
                 pf = uploaded_file
-                st.success("pdf uploaded successfully")
             elif uploaded_file.type == 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
                 ppt = uploaded_file
-                st.success("pptx uploaded successfully")
             else:
                 st.write("File not supported")
     with col1:
-        # if upload file is csv 
-        if df is not None:
-            st.write(df)
-        # if upload file is pdf        
-        if pf is not None:
-            # st.write(pf)
-            st.markdown(embed_pdf(pf), unsafe_allow_html=True)
-            # images = display_pdf_as_images(pf)
-            # for image in images:
-            #     st.image(image, use_column_width=True)
-        # if upload file is md
-        if md is not None:
-            st.markdown(md)
-        # if upload file is pptx
-        if ppt is not None:
+        if show_input_file:
+            if txt is not None:
+                st.text_area("TXT File Content", txt, height=400)
+            if wd is not None:
+                st.write(wd)
+            if df is not None:
+                st.write(df)
+            if md is not None:
+                st.markdown(md)
+            if pf is not None:
+                st.markdown(embed_pdf(pf), unsafe_allow_html=True)
             if ppt is not None:
                 # Save the uploaded file to a temporary location
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".pptx") as tmp_ppt:
@@ -220,7 +219,9 @@ def main():
                 # Display the PDF file
                 st.markdown(empdf(tmp_pdf_path), unsafe_allow_html=True)
                 # Clean up the temporary PPTX file
+                print("tmp_ppt_path--------------",tmp_ppt_path)
                 os.remove(tmp_ppt_path)
+                os.remove(tmp_pdf_path) 
     if GenerateButton and topic:
         # st.info("Generating presentation... Please wait.")
         # slide_titles = generate_slide_titles(topic)
@@ -231,12 +232,8 @@ def main():
         # #print("Slide Contents: ", slide_contents)
         # create_presentation(topic, filtered_slide_titles, slide_contents)
         # #print("Presentation generated successfully!")
-
-
-        st.success("Presentation generated successfully!")
         st.markdown(get_ppt_download_link(topic), unsafe_allow_html=True)
-        st.suceess("Outline Preview")
-        st.success("Slides Preview")
+
 
 
 if __name__ == "__main__":
