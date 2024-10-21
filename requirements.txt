@@ -4,5 +4,10 @@ requests
 python-pptx
 pymupdf
 docx2txt
-fitz
 pdf2image
+python-pptx
+Pillow
+reportlab
+pdf2image
+comtypes
+spire
