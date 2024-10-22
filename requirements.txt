@@ -11,3 +11,4 @@ reportlab
 pdf2image
 comtypes
 spire
+streamlit_modal
