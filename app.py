@@ -43,7 +43,7 @@ def generate_slide_titles(topic):
     return resp
 
 def generate_slide_content(slide_title):
-    prompt = f"Generate content for the slide: '{slide_title}'."
+    prompt = f"Generate content for the slide: '{slide_title}', limit in 120 words."
     msg = [
         {"role": "system", "content":prompt},
         {"role":"user", "content":slide_title}
