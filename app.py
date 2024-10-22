@@ -339,6 +339,7 @@ def main():
                     #** debug 
                     filtered_slide_titles = ['Introduction', 'Methodology', 'Results', 'Conclusion']
                     slide_contents = ['This is the introduction slide.', 'This is the methodology slide.', 'This is the results slide.', 'This is the conclusion slide.']
+                    
                     st.session_state.outputpath = create_presentation(topic, filtered_slide_titles, slide_contents)
                     st.session_state.generatedpath = st.session_state.outputpath
                     st.success("Presentation generated successfully!")
