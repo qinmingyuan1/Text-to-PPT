@@ -2,13 +2,8 @@ streamlit
 toml
 requests
 python-pptx
-pymupdf
+pandas
 docx2txt
-pdf2image
 python-pptx
-Pillow
-reportlab
-pdf2image
 comtypes
-spire
 streamlit_modal

@@ -323,7 +323,7 @@ def main():
                     # main part to generate the presentation
                     
                     # # you should call df, txt, wd, md to generate the presentation
-                    # # chat_history is also need to be called in prompt
+                    # # st.session_state.chat_history is also need to be called in prompt
     
                     # # example
                     # slide_titles = generate_slide_titles(st.session_state.MinSlide,st.session_state.MaxSlide,topic)
