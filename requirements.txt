@@ -2,3 +2,8 @@ streamlit
 toml
 requests
 python-pptx
+pandas
+docx2txt
+python-pptx
+comtypes
+streamlit_modal
