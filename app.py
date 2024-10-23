@@ -45,6 +45,7 @@ def generate_slide_titles(MinSlide,MaxSlide,topic):
     resp = response.json()['choices'][0]['message']['content'].split("\n")
     return resp
 
+
 def generate_slide_content(MaxLine,slide_title):
     prompt = f"Generate content for the slide: '{slide_title}'.And limit the content every page to {MaxLine} lines."
     msg = [
