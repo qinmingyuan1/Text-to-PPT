@@ -12,7 +12,9 @@ import comtypes.client
 # popup modal
 from streamlit_modal import Modal
 
-#** debug 
+import file_parser
+
+#** debug
 # import time
 # import tempfile
 
@@ -203,7 +205,7 @@ def main():
             st.session_state.MaxSlide = st.number_input("Max page num:", min_value=0, max_value=100, value=10, step=1)
         with col_line:
             st.session_state.MaxLine = st.number_input("MaxLine per page:", min_value=0, max_value=20, value=10, step=1)
-        uploaded_file = st.file_uploader("Choose a file",type=['md','docx','csv','txt'])
+        uploaded_file = st.file_uploader("Choose a file",type=['md','docx','csv','xlsx','txt'])
         # New input area for user
         user_input = st.chat_input("If you have more requirements to state:")
         col_gen, col_exit = st.columns([1,1])
@@ -247,23 +249,19 @@ def main():
             for message in st.session_state.chat_history[1:]:
                 messages.chat_message("user").write(message)
         # according to the file type, pass the content to variables
+        content = None
         if uploaded_file is not None:
-            if uploaded_file.type == 'text/csv':
-                df = pd.read_csv(uploaded_file)
-            elif uploaded_file.type == 'application/octet-stream':
-                md = uploaded_file.getvalue().decode("utf-8")
-            elif uploaded_file.type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-                wd = docx2txt.process(uploaded_file)
-            elif uploaded_file.type == 'text/plain':
-                txt = uploaded_file.getvalue().decode("utf-8")
-            #** debug
-            # elif uploaded_file.type == 'application/pdf':
-            #     pf = uploaded_file
-            # elif uploaded_file.type == 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
-            #     ppt = uploaded_file
+            try:
+                content = file_parser.parse(uploaded_file)
+            except file_parser.UnsupportedFileTypeError as e:
+                st.write(e.message)
             else:
-                st.write("File not supported")
-        
+                print(f"text:\n{content['text']}")
+                if "resources" in content:
+                    print("resources:")
+                    for key, value in content["resources"].items():
+                        print(f"{key}: {value}")
+
     with col1: # Left column
         if show_output_preview: # Display the output ppt preview
             if st.session_state.outputpath is not None:
@@ -274,17 +272,26 @@ def main():
                 st.session_state.generatedpath = st.session_state.outputpath
                 st.session_state.outputpath = None
 
-        if show_input_file: # Display the input file preview
-            if (txt is not None) or (wd is not None) or (df is not None) or (md is not None):
-                st.markdown("## Input Preview")
-            if txt is not None:
-                st.text_area("TXT File Content", txt, height=400)
-            if wd is not None:
-                st.write(wd)
-            if df is not None:
-                st.write(df)
-            if md is not None:
-                st.markdown(md)
+        # if show_input_file: # Display the input file preview
+        #     if (txt is not None) or (wd is not None) or (df is not None) or (md is not None):
+        #         st.markdown("## Input Preview")
+        #     if txt is not None:
+        #         st.text_area("TXT File Content", txt, height=400)
+        #     if wd is not None:
+        #         st.write(wd)
+        #     if df is not None:
+        #         st.write(df)
+        #     if md is not None:
+        #         st.markdown(md)
+
+        if show_input_file and content:
+            st.markdown("## Input Preview")
+            st.write(content["text"])
+            if "resources" in content:
+                st.markdown("## Resources Preview")
+                for key, value in content["resources"].items():
+                    st.write(f"{key}: {value}")
+
             #** debug
             # if pf is not None:
             #     st.markdown(embed_pdf(pf), unsafe_allow_html=True)

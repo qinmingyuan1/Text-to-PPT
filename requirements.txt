@@ -7,3 +7,8 @@ docx2txt
 python-pptx
 comtypes
 streamlit_modal
+python-docx
+markdown
+collections
+bs4
+openpyxl
